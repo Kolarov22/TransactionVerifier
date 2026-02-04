@@ -1,4 +1,4 @@
-package com.transverify.transactions.domain.dto;
+package com.transverify.transactions.domain.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

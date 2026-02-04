@@ -1,4 +1,4 @@
-package com.transverify.transactions.domain.dto;
+package com.transverify.transactions.domain.dto.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionResponseDTO {
+public class AddTransactionResponseDTO {
     private UUID transactionId;
     private LocalDateTime transactionDate;
 

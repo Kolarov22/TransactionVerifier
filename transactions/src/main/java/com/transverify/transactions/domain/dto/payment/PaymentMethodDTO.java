@@ -1,4 +1,4 @@
-package com.transverify.transactions.domain.dto;
+package com.transverify.transactions.domain.dto.payment;
 
 import com.transverify.transactions.domain.enums.PaymentProcessor;
 import com.transverify.transactions.domain.enums.PaymentType;

@@ -1,6 +1,6 @@
 package com.transverify.transactions.controllers;
 
-import com.transverify.transactions.domain.dto.RegisterUserRequestDTO;
+import com.transverify.transactions.domain.dto.user.RegisterUserRequestDTO;
 import com.transverify.transactions.domain.entities.User;
 import com.transverify.transactions.services.UserService;
 import lombok.RequiredArgsConstructor;

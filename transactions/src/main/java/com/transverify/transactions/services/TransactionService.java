@@ -5,6 +5,8 @@ import com.transverify.transactions.repositories.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -12,5 +14,9 @@ public class TransactionService {
 
     public Transaction addTransaction(Transaction transaction) {
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> findAllTransactions() {
+        return transactionRepository.findAll();
     }
 }
