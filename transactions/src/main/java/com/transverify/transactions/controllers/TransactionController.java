@@ -7,7 +7,7 @@ import com.transverify.transactions.domain.dto.transaction.TransactionDTO;
 import com.transverify.transactions.domain.entities.PaymentMethod;
 import com.transverify.transactions.domain.entities.Transaction;
 import com.transverify.transactions.domain.entities.User;
-import com.transverify.transactions.kafka.KafkaProducer;
+import com.transverify.transactions.mappers.TransactionMapper;
 import com.transverify.transactions.services.TransactionService;
 import com.transverify.transactions.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import java.util.List;
 public class TransactionController {
     private final TransactionService transactionService;
     private final UserService userService;
-    private final KafkaProducer kafkaProducer;
 
     @PostMapping
     public ResponseEntity<AddTransactionResponseDTO> addTransaction(@RequestBody AddTransactionRequestDTO transactionBody){
@@ -41,13 +40,8 @@ public class TransactionController {
         transaction.setFraudFlag(false);
 
         Transaction savedTransaction = transactionService.addTransaction(transaction);
-        kafkaProducer.produceTransactionEvent(transaction);
-        AddTransactionResponseDTO transactionResponseDTO = new AddTransactionResponseDTO();
-        transactionResponseDTO.setTransactionId(savedTransaction.getId());
-        transactionResponseDTO.setTransactionDate(savedTransaction.getTimestamp());
-
-
-        return ResponseEntity.ok(transactionResponseDTO);
+        AddTransactionResponseDTO dto = TransactionMapper.toResponseDTO(savedTransaction);
+        return ResponseEntity.status(201).body(dto);
 
     }
 
@@ -55,20 +49,7 @@ public class TransactionController {
     public ResponseEntity<List<TransactionDTO>> findAllTransactions(){
         List<Transaction> transactions = transactionService.findAllTransactions();
 
-        List<TransactionDTO> dtos = transactions.stream().map(t -> {
-            TransactionDTO dto = new TransactionDTO();
-            dto.setId(t.getId());
-            dto.setAmount(t.getAmount());
-            dto.setTimestamp(t.getTimestamp());
-            dto.setFraudFlag(t.getFraudFlag());
-            dto.setSenderIBAN(t.getSender().getIBAN());
-            dto.setReceiverIBAN(t.getReceiver().getIBAN());
-            PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
-            paymentMethodDTO.setPaymentProcessor(t.getPaymentInfo().getPaymentProcessor());
-            paymentMethodDTO.setType(t.getPaymentInfo().getType());
-            dto.setPaymentMethod(paymentMethodDTO);
-            return dto;
-        }).toList();
+        List<TransactionDTO> dtos = transactions.stream().map(TransactionMapper::toDTO).toList();
 
         return ResponseEntity.ok(dtos);
     }

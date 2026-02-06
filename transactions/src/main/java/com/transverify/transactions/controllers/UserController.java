@@ -18,7 +18,7 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<Void> addUser(@RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
+    public ResponseEntity<String> addUser(@RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
         User user = new User();
 
         user.setFirstName(registerUserRequestDTO.getFirstName());
@@ -27,6 +27,7 @@ public class UserController {
         user.setIBAN(registerUserRequestDTO.getIBAN());
 
         userService.addUser(user);
-        return ResponseEntity.ok().build();
+        String confirmationMessage = "A new account was set up with the following name: " + user.getFirstName() + " " + user.getLastName();
+        return ResponseEntity.status(201).body(confirmationMessage);
     }
 }
