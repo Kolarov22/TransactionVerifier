@@ -1,4 +1,4 @@
-package com.transverify.analytics.kafka;
+package com.transverify.analytics.config;
 
 import com.transverify.analytics.domain.dto.TransactionDTO;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

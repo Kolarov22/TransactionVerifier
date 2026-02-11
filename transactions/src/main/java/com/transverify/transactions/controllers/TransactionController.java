@@ -7,14 +7,17 @@ import com.transverify.transactions.domain.dto.transaction.TransactionDTO;
 import com.transverify.transactions.domain.entities.PaymentMethod;
 import com.transverify.transactions.domain.entities.Transaction;
 import com.transverify.transactions.domain.entities.User;
+import com.transverify.transactions.http.AnalyticsFeignClient;
 import com.transverify.transactions.mappers.TransactionMapper;
 import com.transverify.transactions.services.TransactionService;
 import com.transverify.transactions.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ import java.util.List;
 public class TransactionController {
     private final TransactionService transactionService;
     private final UserService userService;
+    private final AnalyticsFeignClient analyticsClient;
 
     @PostMapping
     public ResponseEntity<AddTransactionResponseDTO> addTransaction(@RequestBody AddTransactionRequestDTO transactionBody){
@@ -42,7 +46,6 @@ public class TransactionController {
         Transaction savedTransaction = transactionService.addTransaction(transaction);
         AddTransactionResponseDTO dto = TransactionMapper.toResponseDTO(savedTransaction);
         return ResponseEntity.status(201).body(dto);
-
     }
 
     @GetMapping
@@ -52,6 +55,22 @@ public class TransactionController {
         List<TransactionDTO> dtos = transactions.stream().map(TransactionMapper::toDTO).toList();
 
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<List<UUID>> verifyTransactions(){
+        List<TransactionDTO> transactionDTOs = transactionService.findAllTransactions().stream().map(TransactionMapper::toDTO).toList();
+
+        var analyticsCallResponse = analyticsClient.analyzeBulkTransactions(transactionDTOs);
+
+        if (analyticsCallResponse.getStatusCode() != HttpStatus.OK) {
+            return ResponseEntity.status(500).build();
+        }
+
+        List<UUID> fraudulentTransactions = analyticsCallResponse.getBody();
+        transactionService.markFraudulentTransactions(fraudulentTransactions);
+
+        return ResponseEntity.ok(fraudulentTransactions);
     }
 
     

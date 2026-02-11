@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,5 +27,16 @@ public class TransactionService {
 
     public List<Transaction> findAllTransactions() {
         return transactionRepository.findAll();
+    }
+
+    public List<Transaction> markFraudulentTransactions(List<UUID> transactionIds) {
+        List<Transaction> updatedTransactions = transactionRepository.findAllByIdIn(transactionIds).stream().
+                map(t -> {
+                    t.setFraudFlag(true);
+                    return t;
+                }).toList();
+
+        return (List<Transaction>) transactionRepository.saveAll(updatedTransactions);
+
     }
 }
