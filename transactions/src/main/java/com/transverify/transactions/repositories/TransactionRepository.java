@@ -1,6 +1,7 @@
 package com.transverify.transactions.repositories;
 
 import com.transverify.transactions.domain.entities.Transaction;
+import com.transverify.transactions.domain.entities.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,5 @@ import java.util.UUID;
 public interface TransactionRepository extends CrudRepository<Transaction, UUID> {
     List<Transaction> findAll();
     List<Transaction> findAllByIdIn(List<UUID> ids);
+    List<Transaction> findAllBySender(User sender);
 }

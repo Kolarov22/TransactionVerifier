@@ -7,6 +7,7 @@ import com.transverify.transactions.mappers.TransactionMapper;
 import com.transverify.transactions.repositories.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,14 +30,21 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    public List<Transaction> markFraudulentTransactions(List<UUID> transactionIds) {
+    @Transactional
+    public void markFraudulentTransactions(List<UUID> transactionIds) {
         List<Transaction> updatedTransactions = transactionRepository.findAllByIdIn(transactionIds).stream().
                 map(t -> {
                     t.setFraudFlag(true);
                     return t;
                 }).toList();
 
-        return (List<Transaction>) transactionRepository.saveAll(updatedTransactions);
+        transactionRepository.saveAll(updatedTransactions);
+    }
 
+    public boolean hasSuspiciousSender(Transaction transaction) {
+        List<Transaction> senderTransactions = transactionRepository.findAllBySender(transaction.getSender());
+        boolean suspiciousSender = senderTransactions.stream().filter(Transaction::getFraudFlag).count() > 3;
+
+        return suspiciousSender;
     }
 }

@@ -41,7 +41,8 @@ public class TransactionController {
         transaction.setReceiver(receiver);
         transaction.setAmount(transactionBody.getAmount());
         transaction.setPaymentInfo(paymentMethod);
-        transaction.setFraudFlag(false);
+        boolean preliminaryValidatedFraudFlag = transactionService.hasSuspiciousSender(transaction);
+        transaction.setFraudFlag(preliminaryValidatedFraudFlag);
 
         Transaction savedTransaction = transactionService.addTransaction(transaction);
         AddTransactionResponseDTO dto = TransactionMapper.toResponseDTO(savedTransaction);

@@ -19,7 +19,7 @@ Architecture is based on microservices which communicate through Eureka server.
 Microservices available:
  - Transactions:8081 - handles persistence of entities in DB, logic for CRUD operations, exposes API for manipulating entities
  - Analytics:8082 - performs analysis on transaction data, exposes API for getting suspicious transactions
- - Discovery:8761 - Enables inter service discovery with Eureka server
+ - Discovery:8761 - enables inter service discovery with Eureka server
 
 
 
